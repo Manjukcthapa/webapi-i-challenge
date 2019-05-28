@@ -65,12 +65,42 @@ server.delete("/api/users/:id" , (req, res) => {
     })
 })
 
-server.put("/api/users/:id" , (req, res) => {
-    db.update(req.params.id, req.body).then((data) => {
-        res.json({ data });
-    }).catch(() => {
-        res.statusCode(500).send({ error: "The user information could not be modified." })
+// server.put("/api/users/:id" , (req, res) => {
+//     db.update(req.params.id, req.body).then((data) => {
+//         res.json({ data });
+//     }).catch(() => {
+//         res.statusCode(500).send({ error: "The user information could not be modified." })
+//     })
+// })
+
+
+
+server.put('/api/users/:id', (req, res) => {
+    const{id} = req.params;
+    const changes = req.body;
+    const {name, bio} = req.body;
+
+    if (name && bio) {
+    db.update(id, changes)
+    .then( changes => {
+        if(changes) {
+            db.findById(id).then(
+                userUpdate => {
+                    res.status(201).json(userUpdate)
+                }
+            )
+        } else {
+            res.status(400).json({error: "The user with the specified ID does not exist"})
+        }
     })
+    .catch(err => {
+        res.status(404).json({error: "The user information could not be modified." })
+    })
+
+        } else {
+
+            res.status(400).json({errorMessage: "Please provide name and bio for the user."})
+    }
 })
 
 
