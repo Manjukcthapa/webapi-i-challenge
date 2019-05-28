@@ -4,13 +4,42 @@ const server = express();
 
 const db = require('./data/db')
 
-server.post("/api/users" , (req, res) => {
-    const param = req.body;
-    console.log(param)
-    db.insert(param).then((result) => {
-       res.json({ result });
+server.listen(5000, () =>
+  console.log('Server running on http://localhost:5000')
+);
+
+server.use(express.json());
+
+server.post("/api/users",(req,res)=>{
+    console.log(req.body)
+    const user=req.body;
+    const {name, bio} =req.body
+    if(!name || !bio){
+        res.status(400).json({message:"Please provide name and bio for the user." })}
+     
+         db.insert(user)
+         .then(user=>{
+              console.log("The new user",user);
+              res.status(201).json(user);
+        })
+
+
+
+    .catch(error=>{
+        res.status(500).json({error: "There was an error while saving the user to the database" })
+
     })
+
+
 })
+
+// server.post("/api/users" , (req, res) => {
+//     const param = req.body;
+//     console.log(param)
+//     db.insert(param).then((result) => {
+//        res.json({ result });
+//     })
+// })
 
 server.get("/api/users" , (req, res) => {
     db.find().then((data) => {
@@ -44,6 +73,10 @@ server.put("/api/users/:id" , (req, res) => {
     })
 })
 
-server.listen(5000, () =>
-  console.log('Server running on http://localhost:5000')
-);
+
+
+
+
+
+
+
